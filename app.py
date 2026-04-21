@@ -4,10 +4,9 @@ import numpy as np
 import os
 
 st.set_page_config(page_title="ML Predictor", layout="centered")
-
 st.title("ML Model Predictor")
 
-# Load model safely
+# Load model
 if not os.path.exists("model.pkl"):
     st.error("Model file not found!")
 else:
@@ -16,7 +15,7 @@ else:
 
     st.subheader("Enter feature values:")
 
-    # 🔥 Try to get feature names automatically
+    # 🔥 Dynamic feature detection
     try:
         feature_names = model.feature_names_in_
     except:
@@ -25,13 +24,10 @@ else:
     inputs = []
 
     for feature in feature_names:
-        val = st.number_input(f"{feature}", value=0.0)
+        val = st.number_input(feature, value=0.0)
         inputs.append(val)
 
     if st.button("Predict"):
-        try:
-            input_data = np.array([inputs])
-            prediction = model.predict(input_data)
-            st.success(f"Prediction: {prediction[0]}")
-        except Exception as e:
-            st.error(f"Error: {str(e)}")
+        input_data = np.array([inputs])
+        prediction = model.predict(input_data)
+        st.success(f"Prediction: {prediction[0]}")
