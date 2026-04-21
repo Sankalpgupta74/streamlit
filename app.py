@@ -3,31 +3,32 @@ import pickle
 import numpy as np
 import os
 
-st.set_page_config(page_title="ML Predictor", layout="centered")
+st.set_page_config(page_title="ML Model Predictor", layout="centered")
+
+# Title
 st.title("ML Model Predictor")
 
-# Load model
+# Load model safely
 if not os.path.exists("model.pkl"):
-    st.error("Model file not found!")
+    st.error("❌ model.pkl file not found! Please upload it to GitHub.")
 else:
     with open("model.pkl", "rb") as f:
         model = pickle.load(f)
 
-    st.subheader("Enter feature values:")
+    st.write("Enter feature values:")
 
-    # 🔥 Dynamic feature detection
-    try:
-        feature_names = model.feature_names_in_
-    except:
-        feature_names = [f"Feature {i+1}" for i in range(model.n_features_in_)]
-
-    inputs = []
-
-    for feature in feature_names:
-        val = st.number_input(feature, value=0.0)
-        inputs.append(val)
+    # 🔥 SAME features jo tumne model me use kiye
+    temperature = st.number_input("Temperature", value=0.0)
+    vibration = st.number_input("Vibration", value=0.0)
+    humidity = st.number_input("Humidity", value=0.0)
+    pressure = st.number_input("Pressure", value=0.0)
 
     if st.button("Predict"):
-        input_data = np.array([inputs])
-        prediction = model.predict(input_data)
-        st.success(f"Prediction: {prediction[0]}")
+        try:
+            input_data = np.array([[temperature, vibration, humidity, pressure]])
+            prediction = model.predict(input_data)
+
+            st.success(f"Prediction: {prediction[0]}")
+
+        except Exception as e:
+            st.error(f"Error: {e}")
