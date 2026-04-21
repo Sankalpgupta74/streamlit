@@ -3,6 +3,8 @@ import pickle
 import numpy as np
 import os
 
+st.set_page_config(page_title="ML Predictor", layout="centered")
+
 st.title("ML Model Predictor")
 
 # Load model safely
@@ -12,14 +14,24 @@ else:
     with open("model.pkl", "rb") as f:
         model = pickle.load(f)
 
-    st.write("Enter feature values:")
+    st.subheader("Enter feature values:")
 
-    f1 = st.number_input("Feature 1")
-    f2 = st.number_input("Feature 2")
-    f3 = st.number_input("Feature 3")
-    f4 = st.number_input("Feature 4")
+    # 🔥 Try to get feature names automatically
+    try:
+        feature_names = model.feature_names_in_
+    except:
+        feature_names = [f"Feature {i+1}" for i in range(model.n_features_in_)]
+
+    inputs = []
+
+    for feature in feature_names:
+        val = st.number_input(f"{feature}", value=0.0)
+        inputs.append(val)
 
     if st.button("Predict"):
-        input_data = np.array([[f1, f2, f3, f4]])
-        prediction = model.predict(input_data)
-        st.success(f"Prediction: {prediction[0]}")
+        try:
+            input_data = np.array([inputs])
+            prediction = model.predict(input_data)
+            st.success(f"Prediction: {prediction[0]}")
+        except Exception as e:
+            st.error(f"Error: {str(e)}")
